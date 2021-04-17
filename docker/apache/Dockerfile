@@ -10,6 +10,9 @@ RUN yum install httpd -y
 # Specify container listens on specific port
 EXPOSE 80
 
+#label
+LABEL org.opencontainers.image.source=https://github.com/rmuhammad1/CapstoneProject3
+
 # Start Apache server
 CMD ["/usr/sbin/httpd","-D","FOREGROUND"]
 
