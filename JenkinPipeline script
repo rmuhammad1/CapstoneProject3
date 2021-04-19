@@ -29,7 +29,9 @@ pipeline{
         stage('Build Docker Image'){
             steps {
                 sh """ #!/bin/bash
-                    sudo docker build -t capstoneproject3 .
+                    sudo docker build -t capstoneproject3img .
+                ## Tag the image for repository
+                    sudo docker tag 9b39dc4560d9 ghcr.io/rmuhammad1/capstoneproject3/capstoneproject3img:latest
                 """
             }
         }
@@ -37,7 +39,7 @@ pipeline{
         stage('Run Docker Instance'){
             steps {
                 sh """ #!/bin/bash
-                    sudo docker run --name ${ENVIRONMENT}-${currentBuild.number} -d -p 2019:80 capstoneproject3
+                    sudo docker run --name ${ENVIRONMENT}-${currentBuild.number} -d -p 2019:80 capstoneproject3img
                 """
             }
         }
@@ -47,18 +49,6 @@ pipeline{
                 echo 'Running tests on docker container instance ${TMP_DOCKER_CONTAINER}'
                 sh """ #!/bin/bash
                     sudo curl http://localhost:2019 -I -L
-                """
-            }
-        }
-
-        stage('Cleanup Environment'){
-            steps {
-                sh """ #!/bin/bash
-                    ## Uncomment lines below if you wish
-                    ## to navigate to browser URL and view 
-                    ## the test website built for CI/CD example
-                    sudo docker container stop ${ENVIRONMENT}-${currentBuild.number}
-                    sudo docker container rm ${ENVIRONMENT}-${currentBuild.number}
                 """
             }
         }
@@ -75,6 +65,15 @@ pipeline{
                 failure {
                     echo 'Failed to promote environment.'
                 }
+            }
+        }
+        stage('Push to Git'){
+            steps{
+                sh """ #!/bin/bash
+                    ## pusghing to github
+                    sudo docker login ghcr.io -u rmuhammad1 --password=<your own PAT>
+                    sudo docker push ghcr.io/rmuhammad1/capstoneproject3/capstoneproject3img:latest
+                """
             }
         }
     }
